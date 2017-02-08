@@ -1,0 +1,87 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context="com.example.aliakbar.focaloid.fragments.HomeFragment">
+
+    <LinearLayout
+        android:id="@+id/linear_layout_fixed_button"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:weightSum="3">
+
+        <LinearLayout
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:background="#ECEFF1"
+            android:gravity="center_horizontal">
+            <Button
+                android:id="@+id/btn_layout_changer"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="3dp"
+                android:padding="40dp"
+                android:background="@drawable/linear_layout"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_margin="5dp"
+            android:layout_weight="1.5"
+            android:background="#ECEFF1"
+            android:gravity="center_horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/sort"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SORT"
+                android:layout_gravity="center"
+                android:textColor="@color/colorAccent"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_margin="5dp"
+            android:layout_weight="1.5"
+            android:background="#ECEFF1"
+            android:gravity="center_horizontal">
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/filter"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FILTER"
+                android:layout_gravity="center"
+                android:textColor="@color/colorAccent"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <include android:id="@+id/content_main"
+        layout="@layout/content_main"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_below="@id/linear_layout_fixed_button">
+    </include>
+</RelativeLayout>

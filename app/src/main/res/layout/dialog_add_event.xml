@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/viewBg">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="30dp"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:elevation="5dp"
+        android:weightSum="6"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="5dp"
+            android:text="Add an event"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:hint="Event Name"
+            android:id="@+id/event_name"
+            android:textSize="18dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Date"
+            android:clickable="true"
+            android:id="@+id/event_date"
+            android:textSize="18dp"/>
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:hint="Time"
+            android:clickable="true"
+            android:id="@+id/event_time"
+            android:layout_weight="1"
+            android:gravity="center"/>
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/event_spinner"
+            android:textSize="18dp"
+            android:spinnerMode="dropdown"
+            android:layout_marginLeft="5dp"
+            android:entries="@array/event_locations"
+            android:prompt="@string/location_prompt"/>
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:textSize="18dp"
+            android:hint="Comment"
+            android:id="@+id/event_comment"
+            android:layout_weight="2"
+            android:gravity="center"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="20dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="#F44336"
+                android:textColor="@color/white"
+                android:padding="2dp"
+                android:textStyle="bold"
+                android:elevation="50dp"
+                android:layout_marginRight="10dp"
+                android:textAllCaps="false"
+                android:id="@+id/btn_add_event"
+                android:text="Add" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:background="#F44336"
+                android:textStyle="bold"
+                android:padding="2dp"
+                android:textColor="@color/white"
+                android:elevation="50dp"
+                android:textAllCaps="false"
+                android:id="@+id/btn_cancel_event"
+                android:text="Cancel" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

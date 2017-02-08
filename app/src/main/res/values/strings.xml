@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Focaloid</string>
+
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="action_add_favourite">Add to Favourites</string>
+    <string name="action_play_next">Play Next</string>
+    <string name="backdrop_title">LOVE MUSIC</string>
+    <string name="backdrop_subtitle">This season top 20 albums</string>
+
+    <string name="location_prompt">Choose a location</string>
+    <string-array name="event_locations">
+        <item>California</item>
+        <item>Bangalore</item>
+        <item>Sydney</item>
+        <item>Berlin</item>
+        <item>Beirut</item>
+        <item>Milan</item>
+    </string-array>
+    <string name="title_activity_maps_fragment">Map</string>
+    <string name="title_activity_maps">Map</string>
+
+
+</resources>
