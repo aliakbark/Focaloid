@@ -1,5 +1,6 @@
 package com.example.aliakbar.focaloid;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -42,17 +43,17 @@ public class LoginActivity extends AppCompatActivity {
     TextView text_joinus;
     @BindView(R.id.tv_forgotpass)
     TextView text_fpassword;
-    @BindView(R.id.et_username)
-    EditText username;
+    @BindView(R.id.et_email)
+    EditText input_email;
     @BindView(R.id.et_password)
-    EditText password;
+    EditText input_password;
 
-    SQLiteDatabase db=null;
+    private ProgressDialog pDialog;
+    private SessionManager session;
+    private SQLiteHandler db;
+    SQLiteDatabase sdb=null;
 
-    SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs";
-    public static final String uNAME = "usernameKey";
-    public static final String pASSW = "passKey";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +61,23 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         ButterKnife.bind(this);
-        sharedpreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        // Progress dialog
+        pDialog = new ProgressDialog(this);
+        pDialog.setCancelable(false);
 
-        final String username1=sharedpreferences.getString("usernameKey",null);
-        username.setText(username1);
+        // SQLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+
+        // Session manager
+        session = new SessionManager(getApplicationContext());
+
+        // Check if user is already logged in or not
+        if (session.isLoggedIn()) {
+            // User is already logged in. Take him to main activity
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         if (!checkPermission()) {
 //            Toast.makeText(LoginActivity.this,"Permissions not granted",Toast.LENGTH_SHORT).show();
@@ -74,25 +88,24 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_login)
     public void onClick_btn_login() {
+        String email = input_email.getText().toString().trim();
+        String password = input_password.getText().toString().trim();
+
         int flag=0;
-        final String name=username.getText().toString();
-        final String pass=password.getText().toString();
 
-        final Intent intent= new Intent(LoginActivity.this,MainActivity.class);
-
-        db= SQLiteDatabase.openDatabase("data/data/com.example.aliakbar.focaloid/databases/mydb",null,SQLiteDatabase.OPEN_READONLY);
-        String s="SELECT username,password FROM registration";
-        Cursor c=db.rawQuery(s,null);
+        sdb= SQLiteDatabase.openDatabase("data/data/com.example.aliakbar.focaloid/databases/focaloid_ldb",null,SQLiteDatabase.OPEN_READONLY);
+        String s="SELECT email,password FROM user";
+        Cursor c=sdb.rawQuery(s,null);
 
         if (c!=null){
             if (c.moveToFirst()){
                 do {
-                    String user_db=c.getString(c.getColumnIndex("username"));
-                    Log.e("username",user_db);
+                    String user_db=c.getString(c.getColumnIndex("email"));
+                    Log.e("email",user_db);
                     String pass_db=c.getString(c.getColumnIndex("password"));
                     Log.e("password",pass_db);
 
-                    if (user_db.equals(name)&&pass_db.equals(pass)) {
+                    if (user_db.equals(email)&&pass_db.equals(password)) {
                         flag = 1;
                     }
 
@@ -100,19 +113,17 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         if (flag==1){
-            final SharedPreferences.Editor editor = sharedpreferences.edit();
 
-            editor.putString(uNAME,name);
-            editor.putString(pASSW,pass);
-            editor.commit();
+
             Toast.makeText(LoginActivity.this,"Thanks",Toast.LENGTH_LONG).show();
-
-            startActivity(intent);
+            final Intent intent12= new Intent(LoginActivity.this,MainActivity.class);
+            startActivity(intent12);
+            finish();
 
         }
         else {
-            username.setError("Invalid username or password");
-            username.requestFocus();
+            input_email.setError("Invalid username or password");
+            input_email.requestFocus();
         }
     }
 
@@ -187,5 +198,108 @@ public class LoginActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .create()
                 .show();
+    }
+
+    /**
+     * function to verify login details in mysql db
+     * */
+    private void checkLogin(final String email, final String password) {
+
+        pDialog.setMessage("Logging in ...");
+        showDialog();
+
+        // Create login session
+        session.setLogin(true);
+        hideDialog();
+
+//        // Tag used to cancel the request
+//        String tag_string_req = "req_login";
+//
+//        pDialog.setMessage("Logging in ...");
+//        showDialog();
+//
+//        StringRequest strReq = new StringRequest(Method.POST,
+//                AppConfig.URL_LOGIN, new Response.Listener<String>() {
+//
+//            @Override
+//            public void onResponse(String response) {
+//                Log.d(TAG, "Login Response: " + response.toString());
+//                hideDialog();
+//
+//                try {
+//                    JSONObject jObj = new JSONObject(response);
+//                    boolean error = jObj.getBoolean("error");
+//
+//                    // Check for error node in json
+//                    if (!error) {
+//                        // user successfully logged in
+//                        // Create login session
+//                        session.setLogin(true);
+//
+//                        // Now store the user in SQLite
+//                        String uid = jObj.getString("uid");
+//
+//                        JSONObject user = jObj.getJSONObject("user");
+//                        String name = user.getString("name");
+//                        String email = user.getString("email");
+//                        String created_at = user
+//                                .getString("created_at");
+//
+//                        // Inserting row in users table
+//                        db.addUser(name, email, uid, created_at);
+//
+//                        // Launch main activity
+//                        Intent intent = new Intent(LoginActivity.this,
+//                                MainActivity.class);
+//                        startActivity(intent);
+//                        finish();
+//                    } else {
+//                        // Error in login. Get the error message
+//                        String errorMsg = jObj.getString("error_msg");
+//                        Toast.makeText(getApplicationContext(),
+//                                errorMsg, Toast.LENGTH_LONG).show();
+//                    }
+//                } catch (JSONException e) {
+//                    // JSON error
+//                    e.printStackTrace();
+//                    Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        }, new Response.ErrorListener() {
+//
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Log.e(TAG, "Login Error: " + error.getMessage());
+//                Toast.makeText(getApplicationContext(),
+//                        error.getMessage(), Toast.LENGTH_LONG).show();
+//                hideDialog();
+//            }
+//        }) {
+//
+//            @Override
+//            protected Map<String, String> getParams() {
+//                // Posting parameters to login url
+//                Map<String, String> params = new HashMap<String, String>();
+//                params.put("email", email);
+//                params.put("password", password);
+//
+//                return params;
+//            }
+//
+//        };
+//
+//        // Adding request to request queue
+//        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+    }
+
+    private void showDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    private void hideDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
     }
 }

@@ -23,37 +23,12 @@
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="Username"
+                android:hint="Full name"
                 android:layout_gravity="center"
                 android:textAlignment="center"
-                android:id="@+id/username"
+                android:id="@+id/fullname"
                 android:inputType="text"
                 />
-
-            <RadioGroup
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:id="@+id/rg_gender"
-
-                >
-
-                <RadioButton
-                    android:text="Male"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radio_male"
-                    android:layout_weight="1" />
-
-                <RadioButton
-                    android:text="Female"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radio_female"
-                    android:layout_weight="1" />
-            </RadioGroup>
-
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -64,9 +39,6 @@
                 android:inputType="textWebEmailAddress"
 
                 android:linksClickable="false" />
-
-
-
 
             <EditText
                 android:layout_width="fill_parent"
@@ -95,7 +67,7 @@
                 android:gravity="center"
                 android:layout_below="@+id/linearLayout"
                 android:layout_centerHorizontal="true"
-                android:id="@+id/btn_createaccount"
+                android:id="@+id/btn_register"
                 android:background="@drawable/button_border"/>
         </LinearLayout>
 

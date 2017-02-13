@@ -19,7 +19,7 @@ public class ApiClient {
      */
     private static Retrofit getRetrofitInstance() {
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL1)
+                .baseUrl(ROOT_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }

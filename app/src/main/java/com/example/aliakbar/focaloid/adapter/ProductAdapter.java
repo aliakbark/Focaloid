@@ -3,8 +3,10 @@ package com.example.aliakbar.focaloid.adapter;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,8 +19,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.aliakbar.focaloid.R;
 import com.example.aliakbar.focaloid.fragments.ProductDetailFragment;
-import com.example.aliakbar.focaloid.model.Movie;
+import com.example.aliakbar.focaloid.model.AllProducts;
 import com.example.aliakbar.focaloid.rest.Constant;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 import java.util.List;
 
@@ -26,18 +30,18 @@ import java.util.List;
  * Created by user on 1/23/2017.
  */
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.HomeViewHolder>{
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHolder>{
 
     private Context mContext;
-    private List<Movie> movies;
+    private List<AllProducts> products;
 
 
-    public class HomeViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
 
         public TextView title, count;
         public ImageView thumbnail, overflow;
 
-        public HomeViewHolder(View view, Context mContext, List<Movie> movies) {
+        public MyViewHolder(View view, Context mContext, List<AllProducts> products) {
             super(view);
             title = (TextView) view.findViewById(R.id.title);
             count = (TextView) view.findViewById(R.id.count);
@@ -46,38 +50,63 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.HomeView
         }
     }
 
-    public ProductAdapter(Context mContext, List<Movie> movies) {
+    public ProductAdapter(Context mContext, List<AllProducts> products) {
         this.mContext = mContext;
-        this.movies = movies;
+        this.products = products;
     }
 
     @Override
-    public HomeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.dashboard_card, parent, false);
 
-        HomeViewHolder homeViewHolder =new HomeViewHolder(itemView,mContext,movies);
+        MyViewHolder myViewHolder =new MyViewHolder(itemView,mContext,products);
 
-        return homeViewHolder;
+        return myViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(final HomeViewHolder holder, final int position) {
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
 
 
-        holder.title.setText(movies.get(position).getTitle());;
-        holder.count.setText("Price :"+movies.get(position).getVoteAverage().toString());
+        final AllProducts product = products.get(position);
+        holder.title.setText(product.getProName());
+        holder.count.setText(" Price :" + product.getProPrice().toString());
 
-        if (movies.get(position).getBackdropPath() != null) {
-            String images = movies.get(position).getBackdropPath().toString();
-            // Log.d("PicChecking", images);
 
-            // loading album cover using Glide library
-            Glide.with(mContext)
-                    .load(Constant.tmdb_img_url+images)
-                    .into(holder.thumbnail);
-        }
+
+
+//        if (product.getProductImages() != null) {
+//            // Picasso.with(mContext).load(Constant.imageUrlLargeResolution+ productSingleItem.getProductImageL0()).placeholder(R.drawable.product_image_default).fit().into(myViewHolder.productImage);
+//
+//
+//            String images=product.getProductImages();
+//
+//            List<String> list = Lists.newArrayList(Splitter.on(",").splitToList(images));
+//
+//            String img=list.get(0);
+//
+//            // loading album cover using Glide library
+//            Glide.with(mContext).load(Constant.imageUrlLargeResolution+img).into(holder.thumbnail);
+//
+//        }
+
+       if (product.getProductImages() != null) {
+           String images = product.getProductImages().toString();
+
+           List<String> list = Lists.newArrayList(Splitter.on(",").splitToList(images));
+           String img=list.get(0);
+//           Log.d("PicChecking", img);
+
+
+           // loading album cover using Glide library
+           Glide.with(mContext)
+                   .load(Constant.imageUrlLargeResolution+img)
+                   .into(holder.thumbnail);
+       }
+
+
         holder.overflow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,14 +117,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.HomeView
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Fragment fragment = new ProductDetailFragment();
-//                FragmentManager fragmentManager = ((Activity)mContext).getFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                fragmentTransaction.replace(R.id.content_frame, fragment);
-//                fragmentTransaction.commit();
 
+
+
+            Bundle args = new Bundle();
+            args.putString("ProPkId",  product.getProPkId());
 
                 Fragment fragment=new ProductDetailFragment();
+                fragment.setArguments(args);
                 ((Activity)mContext).getFragmentManager().beginTransaction()
                         .replace(R.id.content_frame,fragment,fragment.getClass().getSimpleName())
                         .addToBackStack(null)
@@ -138,7 +167,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.HomeView
 
     @Override
     public int getItemCount() {
-        return movies.size();
+        return products.size();
     }
 
 }

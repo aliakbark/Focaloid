@@ -50,6 +50,9 @@ public class MainActivity extends AppCompatActivity
     Button btn_prof_cam;
     FloatingActionButton fab;
 
+    private SQLiteHandler db;
+    private SessionManager session;
+
 
     // Activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
@@ -71,7 +74,15 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+    // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
 
+        // session manager
+        session = new SessionManager(getApplicationContext());
+
+        if (!session.isLoggedIn()) {
+            logoutUser();
+        }
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -340,5 +351,16 @@ public class MainActivity extends AppCompatActivity
 
     public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
+    }
+
+    private void logoutUser() {
+        session.setLogin(false);
+
+        db.deleteUsers();
+
+        // Launching the login activity
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

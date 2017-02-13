@@ -22,10 +22,8 @@ import android.widget.Toast;
 
 import com.example.aliakbar.focaloid.adapter.ProductAdapter;
 import com.example.aliakbar.focaloid.model.AllProducts;
-import com.example.aliakbar.focaloid.model.AllProductsResponse;
+import com.example.aliakbar.focaloid.model.AllProductsResults;
 import com.example.aliakbar.focaloid.R;
-import com.example.aliakbar.focaloid.model.Movie;
-import com.example.aliakbar.focaloid.model.MovieResponse;
 import com.example.aliakbar.focaloid.rest.ApiClient;
 import com.example.aliakbar.focaloid.rest.ApiInterface;
 
@@ -46,7 +44,7 @@ public class HomeFragment extends Fragment {
     private final static String API_KEY = "1f55851baac668d665ad59a6384318dc";
 
     private ProductAdapter adapter;
-    private List<Movie> movies;
+    private List<AllProducts> data;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -98,24 +96,23 @@ public class HomeFragment extends Fragment {
 
         ApiInterface api = ApiClient.getApiService();
 
-        Call<MovieResponse> call = api.getTopRatedMovies(API_KEY);
+        Call<AllProductsResults> call = api.getProducts("100","0","0","0","1");
 
-        call.enqueue(new Callback<MovieResponse>() {
+        call.enqueue(new Callback<AllProductsResults>() {
             @Override
-            public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+            public void onResponse(Call<AllProductsResults> call, Response<AllProductsResults> response) {
 
-                int statusCode = response.code();
-                movies = response.body().getResults();
+                data = response.body().getData();
 
                 //recyclerView.setAdapter(new ProductAdapter(movies, R.layout.dashboard_card, mcontext));
 
-                adapter = new ProductAdapter(mcontext,movies);
+                adapter = new ProductAdapter(mcontext,data);
                 recyclerView.setAdapter(adapter);
                 loading.dismiss();
             }
 
             @Override
-            public void onFailure(Call<MovieResponse> call, Throwable t) {
+            public void onFailure(Call<AllProductsResults> call, Throwable t) {
                 Toast.makeText(mcontext,"json failure",Toast.LENGTH_LONG).show();
                 Log.d("Error",t.getMessage());
             }

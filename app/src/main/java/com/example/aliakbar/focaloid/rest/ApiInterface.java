@@ -1,7 +1,6 @@
 package com.example.aliakbar.focaloid.rest;
 
-import com.example.aliakbar.focaloid.model.AllProductsResponse;
-import com.example.aliakbar.focaloid.model.MovieResponse;
+import com.example.aliakbar.focaloid.model.AllProductsResults;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -19,17 +18,17 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("services/get_products")
-    Call<AllProductsResponse> getProducts(@Field("usr_fk_id") String usr_fk_id,
-                                          @Field("cat_fk_id") String cat_fk_id,
-                                          @Field("subcat_fk_id") String pro_cat,
-                                          @Field("keyword") String keyword,
-                                          @Field("offset") String cart_offset);
+    Call<AllProductsResults> getProducts(@Field("usr_fk_id") String usr_fk_id,
+                                         @Field("cat_fk_id") String cat_fk_id,
+                                         @Field("subcat_fk_id") String pro_cat,
+                                         @Field("keyword") String keyword,
+                                         @Field("offset") String cart_offset);
 
 
     @FormUrlEncoded
     @POST("services/get_product_details")
     Call<JsonObject> getProductDetail(@Field("pro_pk_id") String pro_pk_id);
 
-    @GET("movie/top_rated")
-    Call<MovieResponse> getTopRatedMovies(@Query("api_key") String apiKey);
+//    @GET("movie/top_rated")
+//    Call<MovieResponse> getTopRatedMovies(@Query("api_key") String apiKey);
 }
