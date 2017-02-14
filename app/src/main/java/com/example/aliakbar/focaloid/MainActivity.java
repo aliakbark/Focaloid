@@ -1,7 +1,9 @@
 package com.example.aliakbar.focaloid;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -39,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import butterknife.BindView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -49,10 +53,7 @@ public class MainActivity extends AppCompatActivity
     CircleImageView imgProfile;
     Button btn_prof_cam;
     FloatingActionButton fab;
-
-    private SQLiteHandler db;
-    private SessionManager session;
-
+    TextView user_name,user_email;
 
     // Activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
@@ -66,6 +67,15 @@ public class MainActivity extends AppCompatActivity
 
     private Uri fileUri; // file url to store image
 
+    private static final String PREFS_NAME = "nameKey";
+    private static final String PREF_EMAIL = "emailKey";
+    private static final String PREF_IMAGE ="image_loc";
+
+    private final String DefaultUnameValue = "Ali Akbar";
+    private final String DefaultEmailValue = "aar8811@gmail.com";
+    private final String DefaultImageValue = "R.drawable.profile_pic";
+
+    public static final String MyPREFERENCES = "MyPrefs";
 
 
 
@@ -74,16 +84,11 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-    // SqLite database handler
-        db = new SQLiteHandler(getApplicationContext());
+      SharedPreferences userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
-        // session manager
-        session = new SessionManager(getApplicationContext());
-
-        if (!session.isLoggedIn()) {
-            logoutUser();
-        }
-
+        final String uName=userPreferences.getString(PREFS_NAME,DefaultUnameValue);
+        final String uEmail=userPreferences.getString(PREF_EMAIL,DefaultEmailValue);
+        final String uProfImage=userPreferences.getString(PREF_IMAGE,DefaultImageValue);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,6 +117,11 @@ public class MainActivity extends AppCompatActivity
         View navView = navigationView.getHeaderView(0);
         btn_prof_cam=(Button) navView.findViewById(R.id.btn_prof_cam);
         imgProfile=(CircleImageView) navView.findViewById(R.id.img_profile);
+        user_name=(TextView) navView.findViewById(R.id.tv_user_name);
+        user_email=(TextView) navView.findViewById(R.id.tv_user_email);
+
+        user_name.setText(uName);
+        user_email.setText(uEmail);
 
         btn_prof_cam.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -353,14 +363,5 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setTitle(title);
     }
 
-    private void logoutUser() {
-        session.setLogin(false);
 
-        db.deleteUsers();
-
-        // Launching the login activity
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(intent);
-        finish();
-    }
 }
