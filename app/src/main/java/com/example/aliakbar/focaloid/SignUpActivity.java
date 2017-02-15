@@ -57,16 +57,20 @@ public class SignUpActivity extends AppCompatActivity {
 
         validation();
 
-        String name = input_fullname.getText().toString().trim();
-        String email = input_email.getText().toString().trim();
-        String password = input_password.getText().toString().trim();
+        String iname = input_fullname.getText().toString().trim();
+        String iemail = input_email.getText().toString().trim();
+        String ipassword = input_password.getText().toString().trim();
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String created_at = sdf.format(new Date());
 
-        if (!name.isEmpty() && !email.isEmpty() && !password.isEmpty()) {
-            databaseAdapter.RegsterUser(name, email, password);
+        if (!iname.isEmpty() && !iemail.isEmpty() && !ipassword.isEmpty()) {
+            databaseAdapter.RegisterUser(iname, iemail, ipassword,created_at);
+            Toast.makeText(getApplicationContext(), "Account Successfully Created ", Toast.LENGTH_LONG).show();
+            Intent mainIntent = new Intent(SignUpActivity.this, LoginActivity.class);
+            SignUpActivity.this.finish();
+            startActivity(mainIntent);
         } else {
             Toast.makeText(getApplicationContext(),
                     "Please enter your details!", Toast.LENGTH_LONG)

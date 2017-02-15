@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         String password=input_password.getText().toString();
 
         String storedPassword=dbAdapter.getsingleUser(input_user);
-        String user_email=dbAdapter.getUserName(input_user);
+        String user_name=dbAdapter.getUserName(input_user);
 
         // check if the Stored password matches with  Password entered by user
         if(password.equals(storedPassword))
@@ -88,8 +88,8 @@ public class LoginActivity extends AppCompatActivity {
             userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             final SharedPreferences.Editor editor = userPreferences.edit();
 
-            editor.putString(uNAME,input_user);
-            editor.putString(uEMAIL,user_email);
+            editor.putString(uNAME,user_name);
+            editor.putString(uEMAIL,input_user);
             editor.commit();
 
 

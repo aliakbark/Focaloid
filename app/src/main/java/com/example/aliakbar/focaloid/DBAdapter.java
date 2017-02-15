@@ -29,9 +29,7 @@ public class DBAdapter {
     private static final String KEY_PASSWORD = "password";
     private static final String KEY_CREATED_AT = "created_at";
 
-    static final String DATABASE_CREATE ="CREATE TABLE " + TABLE_USER + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_NAME + " TEXT,"
-            + KEY_EMAIL + " TEXT UNIQUE," + KEY_PASSWORD + " TEXT,"
-            + KEY_CREATED_AT + " TEXT" + ")";
+    static final String DATABASE_CREATE ="CREATE TABLE "+TABLE_USER+"("+KEY_ID+" integer primary key autoincrement,"+KEY_NAME+" text,"+KEY_EMAIL+" text unique,"+KEY_PASSWORD+" text,"+KEY_CREATED_AT+" text)";
 
     public SQLiteDatabase db;
     private final Context context;
@@ -62,13 +60,14 @@ public class DBAdapter {
         return db;
     }
 
-    public void RegsterUser(String name,String email, String password)
+    public void RegisterUser(String name,String email, String password, String created_at)
     {
         ContentValues newValues=new ContentValues();
 
-        newValues.put(KEY_NAME,name);
-        newValues.put(KEY_EMAIL,email);
-        newValues.put(KEY_PASSWORD,password);
+        newValues.put("name",name);
+        newValues.put("email",email);
+        newValues.put("password",password);
+        newValues.put("created_at",created_at);
 
         db.insert(TABLE_USER,null,newValues);
     }

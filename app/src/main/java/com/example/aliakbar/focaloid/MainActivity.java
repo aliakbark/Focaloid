@@ -86,9 +86,9 @@ public class MainActivity extends AppCompatActivity
 
       SharedPreferences userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
-        final String uName=userPreferences.getString(PREFS_NAME,DefaultUnameValue);
-        final String uEmail=userPreferences.getString(PREF_EMAIL,DefaultEmailValue);
-        final String uProfImage=userPreferences.getString(PREF_IMAGE,DefaultImageValue);
+        final String uName=userPreferences.getString(PREFS_NAME,null);
+        final String uEmail=userPreferences.getString(PREF_EMAIL,null);
+        final String uProfImage=userPreferences.getString(PREF_IMAGE,null);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+           this.finish();
         }
     }
 

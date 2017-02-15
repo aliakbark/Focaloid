@@ -86,6 +86,7 @@ public class HomeFragment extends Fragment {
         loadJSON();
 //        prepareAlbums();
 
+
         return rootView;
     }
 
@@ -118,53 +119,6 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-
-//    private void prepareAlbums() {
-//        int[] covers = new int[]{
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal,
-//                R.drawable.arsenal};
-//
-//        DataModel a = new DataModel("True Romance", 13, covers[0]);
-//        albumList.add(a);
-//
-//        a = new DataModel("Xscpae", 8, covers[1]);
-//        albumList.add(a);
-//
-//        a = new DataModel("Maroon 5", 11, covers[2]);
-//        albumList.add(a);
-//
-//        a = new DataModel("Born to Die", 12, covers[3]);
-//        albumList.add(a);
-//
-//        a = new DataModel("Honeymoon", 14, covers[4]);
-//        albumList.add(a);
-//
-//        a = new DataModel("I Need a Doctor", 1, covers[5]);
-//        albumList.add(a);
-//
-//        a = new DataModel("Loud", 11, covers[6]);
-//        albumList.add(a);
-//
-//        a = new DataModel("Legend", 14, covers[7]);
-//        albumList.add(a);
-//
-//        a = new DataModel("Hello", 11, covers[8]);
-//        albumList.add(a);
-//
-//        a = new DataModel("Greatest Hits", 17, covers[9]);
-//        albumList.add(a);
-//
-//        adapter.notifyDataSetChanged();
-//    }
 
     /**
      * RecyclerView item decoration - give equal margin around grid item
@@ -252,4 +206,5 @@ public class HomeFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
 }
