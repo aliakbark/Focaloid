@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity
     Fragment fragment;
     CircleImageView imgProfile;
     Button btn_prof_cam;
-    FloatingActionButton fab;
+
     TextView user_name,user_email;
 
     // Activity request codes
@@ -86,9 +86,9 @@ public class MainActivity extends AppCompatActivity
 
       SharedPreferences userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
-        final String uName=userPreferences.getString(PREFS_NAME,null);
-        final String uEmail=userPreferences.getString(PREF_EMAIL,null);
-        final String uProfImage=userPreferences.getString(PREF_IMAGE,null);
+        final String uName=userPreferences.getString(PREFS_NAME,DefaultUnameValue);
+        final String uEmail=userPreferences.getString(PREF_EMAIL,DefaultEmailValue);
+        final String uProfImage=userPreferences.getString(PREF_IMAGE,DefaultEmailValue);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -97,14 +97,6 @@ public class MainActivity extends AppCompatActivity
         getFragmentManager().beginTransaction().replace(R.id.content_frame,fragment,fragment.getClass().getSimpleName()).addToBackStack(null).commit();
 
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -208,7 +200,8 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-           this.finish();
+            super.onBackPressed();
+            finish();
         }
     }
 
@@ -248,6 +241,7 @@ public class MainActivity extends AppCompatActivity
             // Handle the home action
             fragment=new HomeFragment();
             getFragmentManager().beginTransaction().replace(R.id.content_frame,fragment,fragment.getClass().getSimpleName()).addToBackStack(null).commit();
+
         } else if (id == R.id.nav_camera) {
 
 
@@ -257,7 +251,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_event) {
             fragment=new EventFragment();
             getFragmentManager().beginTransaction().replace(R.id.content_frame,fragment,fragment.getClass().getSimpleName()).addToBackStack(null).commit();
-            fab.setVisibility(View.GONE);
+
 
         } else if (id == R.id.connect_us) {
             Intent in=new Intent(getApplicationContext(),MapsActivity.class);

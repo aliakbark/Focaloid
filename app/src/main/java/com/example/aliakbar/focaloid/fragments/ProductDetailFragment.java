@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -54,9 +55,13 @@ public class ProductDetailFragment extends Fragment {
     @BindView(R.id.single_product_description)
     TextView single_product_description;
 
+
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
     }
 
