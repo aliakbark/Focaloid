@@ -4,49 +4,45 @@
     android:id="@+id/activity_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
     android:fitsSystemWindows="true"
     tools:context="com.example.aliakbar.focaloid.LoginActivity">
 
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo"
+        android:id="@+id/iv_logo"
+        android:layout_margin="20dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:background="@color/white"
-        android:paddingTop="36dp"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp">
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/logo"
-            android:id="@+id/iv_logo"
-            android:layout_margin="20dp"
-            />
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp">
 
         <!-- Email Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="8dp"
             android:elevation="10dp">
+
             <EditText android:id="@+id/et_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:hint="Email"
-                android:textColorHint="#FFCDD2"
-                />
+                android:textColorHint="#FFCDD2" />
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="10dp">
             <EditText android:id="@+id/et_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -55,82 +51,78 @@
                 android:textColorHint="#FFCDD2"/>
         </android.support.design.widget.TextInputLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <TextView android:id="@+id/tv_forgotpass"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="3dp"
-            android:layout_marginTop="5dp">
-
-            <CheckBox
-                android:text="Remember me"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/cb_rememberme"
-                android:gravity="center"
-                android:textColor="@color/cardview_dark_background"
-                android:layout_alignParentLeft="true"/>
-
-            <TextView android:id="@+id/tv_forgotpass"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Forgot Password?"
-                android:textColor="#0091EA"
-               android:gravity="center"
-                android:layout_alignBaseline="@+id/cb_rememberme"
-                android:layout_alignBottom="@+id/cb_rememberme"
-                android:layout_alignParentEnd="true"
-                android:elevation="5dp"
-                />
-
-
-        </RelativeLayout>
-
+            android:text="Forgot Password?"
+            android:textColor="#0091EA"
+            android:elevation="5dp"
+            android:paddingLeft="5dp"
+            android:layout_marginBottom="20dp"/>
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="30dp"
-            android:padding="12dp"
             android:elevation="5dp"
-            android:textStyle="bold"
+            android:layout_marginBottom="20dp"
             android:textColor="@color/colorPrimaryDark"
             android:background="@drawable/button_border"
             android:text="Login"
             />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:gravity="center"
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign in with"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"/>
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/btn_google_signin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <Button
+            android:id="@+id/btn_fb_signin"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/fb_logo"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:elevation="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Don't have an account?"
+            android:id="@+id/tv_noaccount"
+            android:layout_alignBottom="@+id/tv_signup" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  Sign Up"
+            android:textColor="#0091EA"
+            android:textStyle="bold"
+            android:textSize="16dip"
             android:elevation="5dp"
-            android:layout_marginRight="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="  Sign Up"
-                android:textColor="#0091EA"
-                android:textStyle="bold"
-                android:textSize="16dip"
-                android:elevation="5dp"
-                android:layout_toRightOf="@+id/tv_noaccount"
-                android:id="@+id/tv_signup" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="Don't have an account?"
-                android:id="@+id/tv_noaccount"
-                android:layout_alignBottom="@+id/tv_signup"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="35dp" />
-
-        </RelativeLayout>
+            android:id="@+id/tv_signup" />
 
     </LinearLayout>
 

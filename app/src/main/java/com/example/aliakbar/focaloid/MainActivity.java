@@ -10,9 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.provider.MediaStore;;
 import android.app.Fragment;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
@@ -31,10 +29,15 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.aliakbar.focaloid.fragments.CameraFragment;
 import com.example.aliakbar.focaloid.fragments.EventFragment;
 import com.example.aliakbar.focaloid.fragments.HomeFragment;
 import com.example.aliakbar.focaloid.fragments.ShareAppFragment;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 
 import java.io.File;
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity
 
     TextView user_name,user_email;
 
+    private GoogleApiClient mGoogleApiClient;
+
     // Activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
     public static final int MEDIA_TYPE_IMAGE = 1;
@@ -69,7 +74,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String PREFS_NAME = "nameKey";
     private static final String PREF_EMAIL = "emailKey";
-    private static final String PREF_IMAGE ="image_loc";
+    private static final String PREF_IMAGE ="imageKey";
 
     private final String DefaultUnameValue = "Ali Akbar";
     private final String DefaultEmailValue = "aar8811@gmail.com";
@@ -88,7 +93,7 @@ public class MainActivity extends AppCompatActivity
 
         final String uName=userPreferences.getString(PREFS_NAME,DefaultUnameValue);
         final String uEmail=userPreferences.getString(PREF_EMAIL,DefaultEmailValue);
-        final String uProfImage=userPreferences.getString(PREF_IMAGE,DefaultEmailValue);
+        final String uProfImage=userPreferences.getString(PREF_IMAGE,DefaultImageValue);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -114,6 +119,13 @@ public class MainActivity extends AppCompatActivity
 
         user_name.setText(uName);
         user_email.setText(uEmail);
+        Glide.with(this)
+                .load(uProfImage)
+                .error(R.drawable.error)      // optional
+                .crossFade()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imgProfile);
+
 
         btn_prof_cam.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,6 +269,7 @@ public class MainActivity extends AppCompatActivity
             Intent in=new Intent(getApplicationContext(),MapsActivity.class);
             startActivity(in);
         } else if (id == R.id.nav_logout) {
+            g_signOut();
 
         } else if (id == R.id.nav_share) {
             fragment=new ShareAppFragment();
@@ -293,6 +306,8 @@ public class MainActivity extends AppCompatActivity
                 Glide.with(this)
                         .load(selectedImage)
                         .error(R.drawable.error)      // optional
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(imgProfile);
 
             } else if(requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK)
@@ -357,5 +372,17 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setTitle(title);
     }
 
+    private void g_signOut() {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Intent sIntent=new Intent(MainActivity.this,LoginActivity.class);
+                        Toast.makeText(MainActivity.this, "Logout Successfull", Toast.LENGTH_LONG).show();
+                        MainActivity.this.finish();
+                        startActivity(sIntent);
+                    }
+                });
+    }
 
 }

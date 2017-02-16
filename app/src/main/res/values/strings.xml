@@ -27,6 +27,7 @@
     </string-array>
     <string name="title_activity_maps_fragment">Map</string>
     <string name="title_activity_maps">Map</string>
+    <string name="loading">loading</string>
 
 
 </resources>

@@ -17,12 +17,25 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatImageButton;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,10 +45,16 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int PERMISSION_REQUEST_CODE = 200;
     private View view;
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int RC_SIGN_IN = 007;
+
+    private GoogleApiClient mGoogleApiClient;
+    private ProgressDialog mProgressDialog;
 
     @BindView(R.id.btn_login)
     Button btn_login;
@@ -47,6 +66,13 @@ public class LoginActivity extends AppCompatActivity {
     EditText input_email;
     @BindView(R.id.et_password)
     EditText input_password;
+    @BindView(R.id.btn_google_signin)
+    SignInButton btn_google_signin;
+    @BindView(R.id.btn_fb_signin)
+    Button btn_fb_signin;
+
+
+
 
     DBAdapter dbAdapter;
 
@@ -54,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
     public static final String MyPREFERENCES = "MyPrefs";
     public static final String uNAME = "nameKey";
     public static final String uEMAIL = "emailKey";
+    public static final String uIMAGE = "imageKey";
 
 
     @Override
@@ -72,52 +99,26 @@ public class LoginActivity extends AppCompatActivity {
             requestPermission();
         }
 
-    }
+        btn_google_signin.setOnClickListener(this);
+        btn_fb_signin.setOnClickListener(this);
+        btn_login.setOnClickListener(this);
+        text_joinus.setOnClickListener(this);
+        text_fpassword.setOnClickListener(this);
 
-    @OnClick(R.id.btn_login)
-    public void onClick_btn_login() {
-        String input_user=input_email.getText().toString();
-        String password=input_password.getText().toString();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
 
-        String storedPassword=dbAdapter.getsingleUser(input_user);
-        String user_name=dbAdapter.getUserName(input_user);
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this,this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
+                .build();
 
-        // check if the Stored password matches with  Password entered by user
-        if(password.equals(storedPassword))
-        {
-            userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-            final SharedPreferences.Editor editor = userPreferences.edit();
-
-            editor.putString(uNAME,user_name);
-            editor.putString(uEMAIL,input_user);
-            editor.commit();
-
-
-
-            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
-            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
-            LoginActivity.this.finish();
-            startActivity(intent);
-        }
-        else
-        {
-            input_email.setError("Invalid username or password");
-            input_email.requestFocus();
-        }
+        btn_google_signin.setScopes(gso.getScopeArray());
 
     }
 
-    @OnClick(R.id.tv_signup)
-    public void onClick_text_joinus() {
-        Intent in=new Intent(LoginActivity.this,SignUpActivity.class);
-        startActivity(in);
-    }
 
-    @OnClick(R.id.tv_forgotpass)
-    public void onClick_text_fpassword() {
-        Intent in=new Intent(LoginActivity.this,MainActivity.class);
-        startActivity(in);
-    }
 
     private boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_FINE_LOCATION);
@@ -145,10 +146,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (locationAccepted && cameraAccepted && externalStorageAccepted)
                         Toast.makeText(LoginActivity.this,"Permission Granted, Now you can access location data,external storage and camera.",Toast.LENGTH_LONG).show();
-                       // Snackbar.make(view, "Permission Granted, Now you can access location data,external storage and camera.", Snackbar.LENGTH_LONG).show();
+                        // Snackbar.make(view, "Permission Granted, Now you can access location data,external storage and camera.", Snackbar.LENGTH_LONG).show();
                     else {
                         Toast.makeText(LoginActivity.this,"Permission Denied, You cannot access location data,external storage and camera",Toast.LENGTH_LONG).show();
-                      //  Snackbar.make(view, "Permission Denied, You cannot access location data,external storage and camera.", Snackbar.LENGTH_LONG).show();
+                        //  Snackbar.make(view, "Permission Denied, You cannot access location data,external storage and camera.", Snackbar.LENGTH_LONG).show();
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
@@ -180,5 +181,179 @@ public class LoginActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void g_signIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
 
+    private void l_signIn(){
+
+        String input_user=input_email.getText().toString();
+        String password=input_password.getText().toString();
+
+        String storedPassword=dbAdapter.getsingleUser(input_user);
+        String user_name=dbAdapter.getUserName(input_user);
+
+        // check if the Stored password matches with  Password entered by user
+        if(password.equals(storedPassword))
+        {
+            userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+            final SharedPreferences.Editor editor = userPreferences.edit();
+
+            editor.putString(uNAME,user_name);
+            editor.putString(uEMAIL,input_user);
+            editor.commit();
+
+
+
+            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
+            LoginActivity.this.finish();
+            startActivity(intent);
+        }
+        else
+        {
+            input_email.setError("Invalid username or password");
+            input_email.requestFocus();
+        }
+    }
+
+
+
+
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+
+            Log.e(TAG, "display name: " + acct.getDisplayName());
+
+            String personName = acct.getDisplayName();
+            String personPhotoUrl = acct.getPhotoUrl().toString();
+            String email = acct.getEmail();
+
+            Log.e(TAG, "Name: " + personName + ", email: " + email
+                    + ", Image: " + personPhotoUrl);
+
+            userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+            final SharedPreferences.Editor editor = userPreferences.edit();
+
+            editor.putString(uNAME,personName);
+            editor.putString(uEMAIL,email);
+            editor.putString(uIMAGE,personPhotoUrl);
+            editor.commit();
+            session(true);
+        } else {
+            // Signed out, show unauthenticated UI.
+            session(false);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+
+            case R.id.btn_login:
+                l_signIn();
+                break;
+
+            case R.id.btn_google_signin:
+                g_signIn();
+                break;
+
+            case R.id.btn_fb_signin:
+                // do your code
+                break;
+
+            case R.id.tv_signup:
+                Intent signup_intent=new Intent(LoginActivity.this,SignUpActivity.class);
+                startActivity(signup_intent);
+                break;
+
+            case R.id.tv_forgotpass:
+                Intent forgotp_intent=new Intent(LoginActivity.this,MainActivity.class);
+                startActivity(forgotp_intent);
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        } else {
+//            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (opr.isDone()) {
+            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+            // and the GoogleSignInResult will be available instantly.
+            Log.d(TAG, "Got cached sign-in");
+            GoogleSignInResult result = opr.get();
+            handleSignInResult(result);
+        } else {
+            // If the user has not previously signed in on this device or the sign-in has expired,
+            // this asynchronous branch will attempt to sign in the user silently.  Cross-device
+            // single sign-on will occur in this branch.
+            showProgressDialog();
+            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(GoogleSignInResult googleSignInResult) {
+                    hideProgressDialog();
+                    handleSignInResult(googleSignInResult);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
+
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
+    }
+
+    private void session(boolean isSignedIn) {
+        if (isSignedIn) {
+            Intent sIntent=new Intent(LoginActivity.this,MainActivity.class);
+            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
+            LoginActivity.this.finish();
+            startActivity(sIntent);
+
+        } else {
+
+        }
+    }
 }
