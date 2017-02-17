@@ -6,19 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatImageButton;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,11 +29,9 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
@@ -48,7 +40,6 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int PERMISSION_REQUEST_CODE = 200;
-    private View view;
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 007;
@@ -98,6 +89,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 //            Toast.makeText(LoginActivity.this,"Permissions not granted",Toast.LENGTH_SHORT).show();
             requestPermission();
         }
+
 
         btn_google_signin.setOnClickListener(this);
         btn_fb_signin.setOnClickListener(this);
@@ -243,6 +235,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             editor.putString(uEMAIL,email);
             editor.putString(uIMAGE,personPhotoUrl);
             editor.commit();
+
+            Intent sIntent=new Intent(LoginActivity.this,MainActivity.class);
+            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
+            LoginActivity.this.finish();
+            startActivity(sIntent);
+
             session(true);
         } else {
             // Signed out, show unauthenticated UI.
@@ -347,10 +345,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void session(boolean isSignedIn) {
         if (isSignedIn) {
-            Intent sIntent=new Intent(LoginActivity.this,MainActivity.class);
-            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
-            LoginActivity.this.finish();
-            startActivity(sIntent);
+
 
         } else {
 
