@@ -31,10 +31,13 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.example.aliakbar.focaloid.fragments.CameraFragment;
+import com.example.aliakbar.focaloid.fragments.NotificationsFragment;
 import com.example.aliakbar.focaloid.fragments.EventFragment;
 import com.example.aliakbar.focaloid.fragments.HomeFragment;
 import com.example.aliakbar.focaloid.fragments.ShareAppFragment;
+import com.facebook.AccessTokenTracker;
+import com.facebook.ProfileTracker;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -61,6 +64,10 @@ public class MainActivity extends AppCompatActivity
 
     private GoogleApiClient mGoogleApiClient;
 
+    ProfileTracker profileTracker;
+    AccessTokenTracker accessTokenTracker;
+
+
 
     // Activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
@@ -80,7 +87,7 @@ public class MainActivity extends AppCompatActivity
 
     private final String DefaultUnameValue = "Ali Akbar";
     private final String DefaultEmailValue = "aar8811@gmail.com";
-    private final String DefaultImageValue = "R.drawable.profile_pic";
+    private final String DefaultImageValue = "R.drawable.profile_pic_default";
 
     public static final String MyPREFERENCES = "MyPrefs";
     SharedPreferences userPreferences;
@@ -101,7 +108,6 @@ public class MainActivity extends AppCompatActivity
                 .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
                 .build();
-
 
         final String uName=userPreferences.getString(PREFS_NAME,DefaultUnameValue);
         final String uEmail=userPreferences.getString(PREF_EMAIL,DefaultEmailValue);
@@ -169,7 +175,7 @@ public class MainActivity extends AppCompatActivity
 
                         } else if (id == R.id.prof_b_remove) {
 
-                            Toast.makeText(MainActivity.this, "hehe remove", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Removed", Toast.LENGTH_SHORT).show();
 
                         } else {
 
@@ -213,7 +219,6 @@ public class MainActivity extends AppCompatActivity
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-
         // get the file url
         fileUri = savedInstanceState.getParcelable("file_uri");
     }
@@ -224,7 +229,6 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
         }
     }
 
@@ -265,10 +269,10 @@ public class MainActivity extends AppCompatActivity
             fragment=new HomeFragment();
             getFragmentManager().beginTransaction().replace(R.id.content_frame,fragment,fragment.getClass().getSimpleName()).addToBackStack(null).commit();
 
-        } else if (id == R.id.nav_camera) {
+        } else if (id == R.id.nav_notification) {
 
 
-            fragment=new CameraFragment();
+            fragment=new NotificationsFragment();
             getFragmentManager().beginTransaction().replace(R.id.content_frame,fragment,fragment.getClass().getSimpleName()).addToBackStack(null).commit();
 
         } else if (id == R.id.nav_event) {
@@ -280,8 +284,7 @@ public class MainActivity extends AppCompatActivity
             Intent in=new Intent(getApplicationContext(),MapsActivity.class);
             startActivity(in);
         } else if (id == R.id.nav_logout) {
-
-            g_signOut();
+            Logout();
         } else if (id == R.id.nav_share) {
             fragment=new ShareAppFragment();
             getFragmentManager().beginTransaction().replace(R.id.content_frame,fragment,fragment.getClass().getSimpleName()).addToBackStack(null).commit();
@@ -385,10 +388,17 @@ public class MainActivity extends AppCompatActivity
 
     private void Logout()
     {
+
         clear();
         if (mGoogleApiClient.isConnected()){
             g_signOut();
+        }else {
+            fb_logout();
         }
+
+        Intent logout_intent = new Intent(MainActivity.this,LoginActivity.class);
+        MainActivity.this.finish();
+        startActivity(logout_intent);
 
     }
 
@@ -406,18 +416,21 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void fb_logout(){
+        LoginManager.getInstance().logOut();
+        accessTokenTracker.stopTracking();
+        profileTracker.stopTracking();
+
+    }
+
     private void g_signOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        Intent logout_intent = new Intent(MainActivity.this,LoginActivity.class);
-                        MainActivity.this.finish();
-                        startActivity(logout_intent);
 
                     }
                 });
     }
-
 
 }

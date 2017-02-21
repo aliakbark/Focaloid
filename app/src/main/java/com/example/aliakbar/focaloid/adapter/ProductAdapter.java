@@ -38,13 +38,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView title, count;
+        public TextView title, price;
         public ImageView thumbnail, overflow;
 
         public MyViewHolder(View view, Context mContext, List<AllProducts> products) {
             super(view);
             title = (TextView) view.findViewById(R.id.title);
-            count = (TextView) view.findViewById(R.id.count);
+            price = (TextView) view.findViewById(R.id.price);
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             overflow = (ImageView) view.findViewById(R.id.overflow);
         }
@@ -72,7 +72,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
 
         final AllProducts product = products.get(position);
         holder.title.setText(product.getProName());
-        holder.count.setText(" Price :" + product.getProPrice().toString());
+        holder.price.setText("$ " + product.getProPrice().toString());
 
 
 
@@ -157,7 +157,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
                     Toast.makeText(mContext, "Add to favourite", Toast.LENGTH_SHORT).show();
                     return true;
                 case R.id.action_play_next:
-                    Toast.makeText(mContext, "Play next", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Add to cart", Toast.LENGTH_SHORT).show();
                     return true;
                 default:
             }

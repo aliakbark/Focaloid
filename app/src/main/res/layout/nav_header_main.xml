@@ -20,8 +20,7 @@
                 android:layout_width="@dimen/profile_width"
                 android:layout_height="@dimen/profile_height"
                 android:layout_gravity="center_vertical"
-                android:scaleType="centerCrop"
-                android:src="@drawable/profile_pic" />
+                android:scaleType="centerCrop"/>
 
             <Button
                 android:layout_width="25dp"
@@ -43,14 +42,12 @@
                 android:id="@+id/tv_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Android Studio"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <TextView
                 android:id="@+id/tv_user_email"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="android.studio@android.com" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 

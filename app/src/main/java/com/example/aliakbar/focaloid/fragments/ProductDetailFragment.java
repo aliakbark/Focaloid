@@ -85,11 +85,6 @@ public class ProductDetailFragment extends Fragment {
     private void loadJSON(){
 
         final ProgressDialog loading = ProgressDialog.show(mcontext,"Fetching Data","Please wait...",false,false);
-        /*Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Constant.Base_Url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        APIPlug request = retrofit.create(APIPlug.class);*/
 
         ApiInterface api = ApiClient.getApiService();
 
@@ -117,7 +112,7 @@ public class ProductDetailFragment extends Fragment {
 
                                         String proName = productArray.getJSONObject(i).getString("pro_name");
                                         single_product_title.setText(proName);
-                                        single_product_price.setText("Price : "+productArray.getJSONObject(i).getString("pro_price"));
+                                        single_product_price.setText("$ "+productArray.getJSONObject(i).getString("pro_price"));
 
 
                                         // get our html content
@@ -138,8 +133,9 @@ public class ProductDetailFragment extends Fragment {
 
                                         String img=list.get(0);
 
-                                        // loading album cover using Glide library
-                                        Glide.with(mcontext).load(Constant.imageUrlLargeResolution+img).into(thumbnail);
+                                        Glide.with(mcontext)
+                                                .load(Constant.imageUrlLargeResolution+img)
+                                                .into(thumbnail);
 
                                         loading.dismiss();
 

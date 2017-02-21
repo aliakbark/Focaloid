@@ -20,6 +20,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -29,6 +40,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +59,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
 
+    private CallbackManager callbackManager;
+    private AccessTokenTracker accessTokenTracker;
+    private ProfileTracker profileTracker;
+
     @BindView(R.id.btn_login)
     Button btn_login;
     @BindView(R.id.tv_signup)
@@ -60,10 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @BindView(R.id.btn_google_signin)
     SignInButton btn_google_signin;
     @BindView(R.id.btn_fb_signin)
-    Button btn_fb_signin;
-
-
-
+    LoginButton btn_fb_signin;
 
     DBAdapter dbAdapter;
 
@@ -72,6 +85,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public static final String uNAME = "nameKey";
     public static final String uEMAIL = "emailKey";
     public static final String uIMAGE = "imageKey";
+
 
 
     @Override
@@ -90,6 +104,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             requestPermission();
         }
 
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
 
         btn_google_signin.setOnClickListener(this);
         btn_fb_signin.setOnClickListener(this);
@@ -107,6 +123,48 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .build();
 
         btn_google_signin.setScopes(gso.getScopeArray());
+
+        btn_fb_signin.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+
+                profileTracker = new ProfileTracker() {
+                    @Override
+                    protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                        if(Profile.getCurrentProfile()!=null) {
+
+                            userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+                            final SharedPreferences.Editor editor = userPreferences.edit();
+
+                            editor.putString(uEMAIL, currentProfile.getId());
+                            editor.putString(uNAME, currentProfile.getFirstName() + " " + currentProfile.getLastName());
+                            editor.putString("firstname", currentProfile.getFirstName());
+                            editor.putString("lastname", currentProfile.getLastName());
+                            editor.putString(uIMAGE, "https://graph.facebook.com/" + currentProfile.getId() + "/picture?type=large");
+                            editor.commit();
+
+                            Intent flIntent=new Intent(LoginActivity.this,MainActivity.class);
+                            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
+                            LoginActivity.this.finish();
+                            startActivity(flIntent);
+
+                        }else {
+                            LoginManager.getInstance().logOut();
+                        }
+                    }
+                };
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(LoginActivity.this, "Login attempt canceled.", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+                Toast.makeText(LoginActivity.this, "Login attempt failed.", Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 
@@ -210,30 +268,34 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-
-
-
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
+
+            if (getBaseContext() == null) {
+                return;
+            }
+
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
 
             Log.e(TAG, "display name: " + acct.getDisplayName());
 
             String personName = acct.getDisplayName();
-            String personPhotoUrl = acct.getPhotoUrl().toString();
+            String personPhotoUrl = String.valueOf(acct.getPhotoUrl());
             String email = acct.getEmail();
 
-            Log.e(TAG, "Name: " + personName + ", email: " + email
-                    + ", Image: " + personPhotoUrl);
+            String pPhotoUrl = null;
+            if (personPhotoUrl != null) {
+                pPhotoUrl = personPhotoUrl;
+            }
 
             userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             final SharedPreferences.Editor editor = userPreferences.edit();
 
             editor.putString(uNAME,personName);
             editor.putString(uEMAIL,email);
-            editor.putString(uIMAGE,personPhotoUrl);
+            editor.putString(uIMAGE,pPhotoUrl);
             editor.commit();
 
             Intent sIntent=new Intent(LoginActivity.this,MainActivity.class);
@@ -262,7 +324,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.btn_fb_signin:
-                // do your code
                 break;
 
             case R.id.tv_signup:
@@ -290,8 +351,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         } else {
-//            callbackManager.onActivityResult(requestCode, resultCode, data);
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(profileTracker!=null)
+            profileTracker.stopTracking();
     }
 
     @Override
@@ -346,9 +414,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void session(boolean isSignedIn) {
         if (isSignedIn) {
 
-
         } else {
 
         }
     }
+
 }
