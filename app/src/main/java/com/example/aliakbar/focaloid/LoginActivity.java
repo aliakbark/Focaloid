@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,16 +79,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     SignInButton btn_google_signin;
     @BindView(R.id.btn_fb_signin)
     LoginButton btn_fb_signin;
+    @BindView(R.id.activity_login)
+    RelativeLayout relativeLayout;
 
     DBAdapter dbAdapter;
 
-    SharedPreferences userPreferences;
-    public static final String MyPREFERENCES = "MyPrefs";
-    public static final String uNAME = "nameKey";
-    public static final String uEMAIL = "emailKey";
-    public static final String uIMAGE = "imageKey";
-
-
+    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,12 +93,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         ButterKnife.bind(this);
 
+        // Session Manager
+        session = new SessionManager(getApplicationContext());
+
+        Snackbar.make(relativeLayout,"Please login to continue.", Snackbar.LENGTH_LONG).show();
+
         dbAdapter=new DBAdapter(this);
         dbAdapter=dbAdapter.open();
 
 
         if (!checkPermission()) {
-//            Toast.makeText(LoginActivity.this,"Permissions not granted",Toast.LENGTH_SHORT).show();
             requestPermission();
         }
 
@@ -124,6 +126,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         btn_google_signin.setScopes(gso.getScopeArray());
 
+        if (AccessToken.getCurrentAccessToken() != null && com.facebook.Profile.getCurrentProfile() != null){
+
+            LoginManager.getInstance().logOut();
+        }
+
         btn_fb_signin.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -133,20 +140,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
                         if(Profile.getCurrentProfile()!=null) {
 
-                            userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-                            final SharedPreferences.Editor editor = userPreferences.edit();
+                            String user_name = currentProfile.getFirstName() + " " + currentProfile.getLastName();
+                            String user_email = currentProfile.getId();
+                            String personPhotoUrl = "https://graph.facebook.com/" + currentProfile.getId() + "/picture?type=large";
 
-                            editor.putString(uEMAIL, currentProfile.getId());
-                            editor.putString(uNAME, currentProfile.getFirstName() + " " + currentProfile.getLastName());
-                            editor.putString("firstname", currentProfile.getFirstName());
-                            editor.putString("lastname", currentProfile.getLastName());
-                            editor.putString(uIMAGE, "https://graph.facebook.com/" + currentProfile.getId() + "/picture?type=large");
-                            editor.commit();
-
-                            Intent flIntent=new Intent(LoginActivity.this,MainActivity.class);
-                            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
-                            LoginActivity.this.finish();
-                            startActivity(flIntent);
+                            String user_photo_url = null;
+                            if (personPhotoUrl != null) {
+                                user_photo_url = personPhotoUrl;
+                            }
+                            session.createLoginSession(user_name,user_email,user_photo_url);
+                            loginIntent();
 
                         }else {
                             LoginManager.getInstance().logOut();
@@ -168,7 +171,37 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
+    @Override
+    public void onClick(View v) {
 
+        switch (v.getId()) {
+
+            case R.id.btn_login:
+                l_signIn();
+                break;
+
+            case R.id.btn_google_signin:
+                g_signIn();
+                break;
+
+            case R.id.btn_fb_signin:
+                break;
+
+            case R.id.tv_signup:
+                Intent signup_intent=new Intent(LoginActivity.this,SignUpActivity.class);
+                startActivity(signup_intent);
+                break;
+
+            case R.id.tv_forgotpass:
+                Intent forgotp_intent=new Intent(LoginActivity.this,MainActivity.class);
+                startActivity(forgotp_intent);
+                break;
+
+            default:
+                break;
+        }
+
+    }
 
     private boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_FINE_LOCATION);
@@ -195,11 +228,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     boolean externalStorageAccepted = grantResults[2] == PackageManager.PERMISSION_GRANTED;
 
                     if (locationAccepted && cameraAccepted && externalStorageAccepted)
-                        Toast.makeText(LoginActivity.this,"Permission Granted, Now you can access location data,external storage and camera.",Toast.LENGTH_LONG).show();
-                        // Snackbar.make(view, "Permission Granted, Now you can access location data,external storage and camera.", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(relativeLayout, "Permission Granted, Now you can access location data,external storage and camera.", Snackbar.LENGTH_SHORT).show();
                     else {
-                        Toast.makeText(LoginActivity.this,"Permission Denied, You cannot access location data,external storage and camera",Toast.LENGTH_LONG).show();
-                        //  Snackbar.make(view, "Permission Denied, You cannot access location data,external storage and camera.", Snackbar.LENGTH_LONG).show();
+                          Snackbar.make(relativeLayout, "Permission Denied, You cannot access location data,external storage and camera.", Snackbar.LENGTH_SHORT).show();
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
@@ -238,34 +269,37 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void l_signIn(){
 
-        String input_user=input_email.getText().toString();
+        String user_email=input_email.getText().toString();
         String password=input_password.getText().toString();
 
-        String storedPassword=dbAdapter.getsingleUser(input_user);
-        String user_name=dbAdapter.getUserName(input_user);
 
-        // check if the Stored password matches with  Password entered by user
-        if(password.equals(storedPassword))
-        {
-            userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-            final SharedPreferences.Editor editor = userPreferences.edit();
+        // Check if username, password is filled
+        if(user_email.trim().length() > 0 && password.trim().length() > 0){
 
-            editor.putString(uNAME,user_name);
-            editor.putString(uEMAIL,input_user);
-            editor.commit();
+            String storedPassword=dbAdapter.getsingleUser(user_email);
+            String user_name=dbAdapter.getUserName(user_email);
+            String personPhotoUrl = null;
 
+            String user_photo_url = null;
+            if (personPhotoUrl != null) {
+                user_photo_url = personPhotoUrl;
+            }
 
+            // check if the Stored password matches with  Password entered by user
+            if(password.equals(storedPassword))
+            {
+                session.createLoginSession(user_name,user_email,user_photo_url);
+                loginIntent();
+            }else {
+                input_email.setError("Invalid username or password");
+                input_email.requestFocus();
+            }
 
-            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
-            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
-            LoginActivity.this.finish();
-            startActivity(intent);
-        }
-        else
-        {
-            input_email.setError("Invalid username or password");
+        }else {
+            input_email.setError("Please enter username or password");
             input_email.requestFocus();
         }
+
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
@@ -281,65 +315,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             Log.e(TAG, "display name: " + acct.getDisplayName());
 
-            String personName = acct.getDisplayName();
+            String user_name = acct.getDisplayName();
+            String user_email = acct.getEmail();
             String personPhotoUrl = String.valueOf(acct.getPhotoUrl());
-            String email = acct.getEmail();
 
-            String pPhotoUrl = null;
+
+            String user_photo_url = null;
             if (personPhotoUrl != null) {
-                pPhotoUrl = personPhotoUrl;
+                user_photo_url = personPhotoUrl;
             }
 
-            userPreferences= getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-            final SharedPreferences.Editor editor = userPreferences.edit();
+            session.createLoginSession(user_name,user_email,user_photo_url);
+            loginIntent();
 
-            editor.putString(uNAME,personName);
-            editor.putString(uEMAIL,email);
-            editor.putString(uIMAGE,pPhotoUrl);
-            editor.commit();
-
-            Intent sIntent=new Intent(LoginActivity.this,MainActivity.class);
-            Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
-            LoginActivity.this.finish();
-            startActivity(sIntent);
-
-            session(true);
-        } else {
-            // Signed out, show unauthenticated UI.
-            session(false);
         }
-    }
-
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-
-            case R.id.btn_login:
-                l_signIn();
-                break;
-
-            case R.id.btn_google_signin:
-                g_signIn();
-                break;
-
-            case R.id.btn_fb_signin:
-                break;
-
-            case R.id.tv_signup:
-                Intent signup_intent=new Intent(LoginActivity.this,SignUpActivity.class);
-                startActivity(signup_intent);
-                break;
-
-            case R.id.tv_forgotpass:
-                Intent forgotp_intent=new Intent(LoginActivity.this,MainActivity.class);
-                startActivity(forgotp_intent);
-                break;
-
-            default:
-                break;
-        }
-
     }
 
     @Override
@@ -411,12 +400,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void session(boolean isSignedIn) {
-        if (isSignedIn) {
-
-        } else {
-
-        }
+    private void loginIntent() {
+        Intent intent=new Intent(getApplicationContext(),MainActivity.class);
+        Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_LONG).show();
+        startActivity(intent);
+        LoginActivity.this.finish();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

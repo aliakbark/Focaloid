@@ -2,6 +2,7 @@ package com.example.aliakbar.focaloid.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.aliakbar.focaloid.MainActivity;
 import com.example.aliakbar.focaloid.adapter.ProductAdapter;
 import com.example.aliakbar.focaloid.model.AllProducts;
 import com.example.aliakbar.focaloid.model.AllProductsResults;
@@ -27,7 +29,6 @@ import com.example.aliakbar.focaloid.R;
 import com.example.aliakbar.focaloid.rest.ApiClient;
 import com.example.aliakbar.focaloid.rest.ApiInterface;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,10 +39,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
-
-
-    // TODO - insert your themoviedb.org API KEY here
-    private final static String API_KEY = "1f55851baac668d665ad59a6384318dc";
 
     private ProductAdapter adapter;
     private List<AllProducts> data;
@@ -68,24 +65,20 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        ((MainActivity) getActivity()).setActionBarTitle("Home");
+
         ButterKnife.bind(this,rootView);
         mcontext=rootView.getContext();
 
         gridLayoutManager = new GridLayoutManager(rootView.getContext(), 2);
         linearLayoutManager = new LinearLayoutManager(getActivity());
-//
-//        movies = new ArrayList<>();
-//        adapter = new ProductAdapter(mcontext, movies);
 
-//        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(rootView.getContext(),2);
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
 
         loadJSON();
-//        prepareAlbums();
-
 
         return rootView;
     }
@@ -104,8 +97,6 @@ public class HomeFragment extends Fragment {
             public void onResponse(Call<AllProductsResults> call, Response<AllProductsResults> response) {
 
                 data = response.body().getData();
-
-                //recyclerView.setAdapter(new ProductAdapter(movies, R.layout.dashboard_card, mcontext));
 
                 adapter = new ProductAdapter(mcontext,data);
                 recyclerView.setAdapter(adapter);
@@ -175,8 +166,6 @@ public class HomeFragment extends Fragment {
 
             float deg = btn_layout_changer.getRotation() + 180F;
             btn_layout_changer.animate().rotation(deg).setInterpolator(new AccelerateDecelerateInterpolator());
-
-
             btn_layout_changer.setBackgroundResource(R.drawable.grid_layout);
             recyclerView.setLayoutManager(linearLayoutManager);
 
@@ -194,6 +183,7 @@ public class HomeFragment extends Fragment {
         }
 
     }
+
 
     @Override
     public void onDetach() {

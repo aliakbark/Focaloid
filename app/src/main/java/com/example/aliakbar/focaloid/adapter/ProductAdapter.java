@@ -126,7 +126,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
                 Fragment fragment=new ProductDetailFragment();
                 fragment.setArguments(args);
                 ((Activity)mContext).getFragmentManager().beginTransaction()
-                        .replace(R.id.content_frame,fragment,fragment.getClass().getSimpleName())
+                        .replace(R.id.content_frame,fragment)
                         .addToBackStack(null)
                         .commit();
             }

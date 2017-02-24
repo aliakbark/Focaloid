@@ -11,7 +11,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -28,7 +29,7 @@
                 android:id="@+id/btn_prof_cam"
                 android:background="@drawable/prof_camera"
                 android:layout_alignBottom="@+id/img_profile"
-                android:layout_marginLeft="70dp"
+                android:layout_marginLeft="50dp"
                 />
         </RelativeLayout>
 
@@ -37,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:layout_marginLeft="5dp">
+            android:layout_marginLeft="8dp">
             <TextView
                 android:id="@+id/tv_user_name"
                 android:layout_width="wrap_content"

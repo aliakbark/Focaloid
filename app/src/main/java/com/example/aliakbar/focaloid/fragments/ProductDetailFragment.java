@@ -55,9 +55,6 @@ public class ProductDetailFragment extends Fragment {
     @BindView(R.id.single_product_description)
     TextView single_product_description;
 
-
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,8 +163,7 @@ public class ProductDetailFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onResume() {
+        super.onResume();
     }
-
 }

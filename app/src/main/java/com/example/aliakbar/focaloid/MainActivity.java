@@ -35,6 +35,7 @@ import com.example.aliakbar.focaloid.fragments.NotificationsFragment;
 import com.example.aliakbar.focaloid.fragments.EventFragment;
 import com.example.aliakbar.focaloid.fragments.HomeFragment;
 import com.example.aliakbar.focaloid.fragments.ShareAppFragment;
+import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
@@ -49,6 +50,7 @@ import com.google.android.gms.common.api.Status;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity
     ProfileTracker profileTracker;
     AccessTokenTracker accessTokenTracker;
 
-
+    SessionManager session;
 
     // Activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
@@ -81,25 +83,22 @@ public class MainActivity extends AppCompatActivity
 
     private Uri fileUri; // file url to store image
 
-    private static final String PREFS_NAME = "nameKey";
-    private static final String PREF_EMAIL = "emailKey";
-    private static final String PREF_IMAGE ="imageKey";
-
-    private final String DefaultUnameValue = "Ali Akbar";
-    private final String DefaultEmailValue = "aar8811@gmail.com";
-    private final String DefaultImageValue = "R.drawable.profile_pic_default";
-
-    public static final String MyPREFERENCES = "MyPrefs";
-    SharedPreferences userPreferences;
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        session = new SessionManager(getApplicationContext());
+
+//        Toast.makeText(getApplicationContext(), "User Login Status: " + session.isLoggedIn(), Toast.LENGTH_SHORT).show();
+        session.checkLogin();
+
+        // get user data from session
+        HashMap<String, String> user = session.getUserDetails();
+
+        final String uName = user.get(SessionManager.KEY_NAME);
+        final String uEmail = user.get(SessionManager.KEY_EMAIL);
+        final String uProfImage = user.get(SessionManager.KEY_IMAGE);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .build();
@@ -108,10 +107,6 @@ public class MainActivity extends AppCompatActivity
                 .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
                 .build();
-
-        final String uName=userPreferences.getString(PREFS_NAME,DefaultUnameValue);
-        final String uEmail=userPreferences.getString(PREF_EMAIL,DefaultEmailValue);
-        final String uProfImage=userPreferences.getString(PREF_IMAGE,DefaultImageValue);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -229,6 +224,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            finish();
         }
     }
 
@@ -386,51 +382,27 @@ public class MainActivity extends AppCompatActivity
         getSupportActionBar().setTitle(title);
     }
 
-    private void Logout()
-    {
+    private void Logout() {
 
-        clear();
         if (mGoogleApiClient.isConnected()){
-            g_signOut();
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                    new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(Status status) {
+
+                        }
+                    });
         }else {
-            fb_logout();
+               LoginManager.getInstance().logOut();
+               accessTokenTracker.stopTracking();
+               profileTracker.stopTracking();
         }
-
-        Intent logout_intent = new Intent(MainActivity.this,LoginActivity.class);
+        session.logoutUser();
         MainActivity.this.finish();
-        startActivity(logout_intent);
-
     }
-
-    public void clear()
-    {
-        userPreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = userPreferences.edit();
-        editor.clear();
-        editor.commit();
-    }
-
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
-    private void fb_logout(){
-        LoginManager.getInstance().logOut();
-        accessTokenTracker.stopTracking();
-        profileTracker.stopTracking();
-
-    }
-
-    private void g_signOut() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-
-                    }
-                });
-    }
-
 }
