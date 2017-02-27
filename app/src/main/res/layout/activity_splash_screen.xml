@@ -5,29 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg"
+    android:gravity="center_vertical"
     android:orientation="vertical"
     tools:context="com.example.aliakbar.focaloid.SplashScreen">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="120dp">
+        android:layout_gravity="center">
 
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@drawable/logo" />
+            android:layout_gravity="center"
+            android:src="@drawable/logo_colored" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:layout_marginTop="30dp"
             android:textStyle="normal"
             android:textSize="25dp"
-            android:textColor="#D50000"
+            android:textColor="#00897B"
             android:text="Focaloid Training"/>
 
     </LinearLayout>

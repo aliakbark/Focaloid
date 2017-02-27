@@ -58,9 +58,10 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/ratingBar"
                 android:isIndicator="true"
+                android:rating="2.5"
                 style="@style/Widget.AppCompat.RatingBar.Small"
                 android:layout_below="@+id/price"
-                android:paddingLeft="10dp"/>
+                android:padding="5dp"/>
 
             <ImageView
                 android:id="@+id/overflow"

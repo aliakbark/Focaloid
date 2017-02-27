@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.aliakbar.focaloid.R;
+import com.example.aliakbar.focaloid.fragments.HomeFragment;
 import com.example.aliakbar.focaloid.fragments.ProductDetailFragment;
 import com.example.aliakbar.focaloid.model.AllProducts;
 import com.example.aliakbar.focaloid.rest.Constant;
@@ -34,6 +35,9 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
 
     private Context mContext;
     private List<AllProducts> products;
+
+    HomeFragment hm = new HomeFragment();
+
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -73,24 +77,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
         final AllProducts product = products.get(position);
         holder.title.setText(product.getProName());
         holder.price.setText("$ " + product.getProPrice().toString());
-
-
-
-
-//        if (product.getProductImages() != null) {
-//            // Picasso.with(mContext).load(Constant.imageUrlLargeResolution+ productSingleItem.getProductImageL0()).placeholder(R.drawable.product_image_default).fit().into(myViewHolder.productImage);
-//
-//
-//            String images=product.getProductImages();
-//
-//            List<String> list = Lists.newArrayList(Splitter.on(",").splitToList(images));
-//
-//            String img=list.get(0);
-//
-//            // loading album cover using Glide library
-//            Glide.with(mContext).load(Constant.imageUrlLargeResolution+img).into(holder.thumbnail);
-//
-//        }
 
        if (product.getProductImages() != null) {
            String images = product.getProductImages().toString();

@@ -5,7 +5,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.CheckableImageButton;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -35,6 +38,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,8 +56,15 @@ public class ProductDetailFragment extends Fragment {
     TextView single_product_title;
     @BindView(R.id.single_product_price)
     TextView single_product_price;
+    @BindView(R.id.single_product_discount_price)
+    TextView single_product_discount_price;
     @BindView(R.id.single_product_description)
     TextView single_product_description;
+
+    @BindView(R.id.btn_add_to_cart)
+    AppCompatButton btn_add_to_cart;
+    @BindView(R.id.btn_favourite)
+    CheckableImageButton btn_favourite;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -132,6 +143,7 @@ public class ProductDetailFragment extends Fragment {
 
                                         Glide.with(mcontext)
                                                 .load(Constant.imageUrlLargeResolution+img)
+                                                .error(R.drawable.error)
                                                 .into(thumbnail);
 
                                         loading.dismiss();
@@ -165,5 +177,22 @@ public class ProductDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+    @OnClick(R.id.btn_favourite)
+    public void onClick_btn_favourite(){
+        btn_favourite.setSelected(!btn_favourite.isSelected());
+
+        if (btn_favourite.isSelected()){
+
+        }else{
+
+        }
+    }
+
+    @OnClick(R.id.btn_add_to_cart)
+    public void onClick_btn_add_to_cart(){
+        Snackbar.make(getView(), "Item added to cart", Snackbar.LENGTH_SHORT).show();
+
     }
 }
